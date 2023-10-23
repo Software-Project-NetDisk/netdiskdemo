@@ -1,4 +1,5 @@
 package com.springboot.entity;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,18 +12,14 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("file_info")
-public class FileInfo {
+@TableName("user_info")
+public class UserInfo {
     @TableId(type = IdType.AUTO)
-    private Integer file_id;
-    private String file_name;
-    private Integer file_type;
-    private Integer file_size;
-    private Timestamp update_time;
     private Integer user_id;
-    private Integer file_pid;
-    private Integer recycled;
-    private String file_md5;
-    private String file_path;
-    private Integer is_folder;
+    private String user_name;
+    private String password;
+    private String email;
+    private Integer space;
+    private Integer is_VIP;
+    private Timestamp deadline;
 }
