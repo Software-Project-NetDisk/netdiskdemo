@@ -1,5 +1,7 @@
 package com.springboot.interceptor;
 
+import com.springboot.entity.MyException;
+import com.springboot.entity.ReturnCode;
 import com.springboot.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +40,27 @@ public class TokenHandlerInterceptor implements HandlerInterceptor {
         //为空就返回错误
         String token = httpServletRequest.getHeader("token");
         if (null == token || "".equals(token.trim())) {
-            return false;
+            int code = ReturnCode.LOST_TOKEN.getCode();
+            String message = ReturnCode.LOST_TOKEN.getMessage();
+            throw new MyException(code, message);
         }
-        log.info("==============token:" + token);
-        Map<String, String> map = tokenUtil.parseToken(token);
+//        log.info("==============token:" + token);
+        Map<String, String> map;
+        try {
+            map = tokenUtil.parseToken(token);
+        } catch (Exception e) {
+            int code = ReturnCode.INVALID_TOKEN.getCode();
+            String message = ReturnCode.INVALID_TOKEN.getMessage();
+            throw new MyException(code, message);
+        }
+
         String user_id = map.get("userId");
         String userRole = map.get("userRole");
         long timeOfUse = System.currentTimeMillis() - Long.parseLong(map.get("timeStamp"));
+//        log.info("tokenTime"+map.get("timeStamp"));
+//        log.info("systemTime"+System.currentTimeMillis());
+//        log.info("timeOfUse"+Long.toString(timeOfUse));
+//        log.info("refreshTime"+Long.toString(refreshTime));
         //1.判断 token 是否过期
         if (timeOfUse < refreshTime) {
             log.info("token验证成功");
@@ -58,7 +74,9 @@ public class TokenHandlerInterceptor implements HandlerInterceptor {
         }
         //token过期就返回 token 无效.
         else {
-            return false;
+            int code = ReturnCode.OVERDUE_TOKEN.getCode();
+            String message = ReturnCode.OVERDUE_TOKEN.getMessage();
+            throw new MyException(code, message);
         }
     }
 }

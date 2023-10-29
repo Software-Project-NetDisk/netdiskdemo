@@ -1,5 +1,6 @@
 package com.springboot.interceptor;
 
+import com.springboot.entity.MyException;
 import com.springboot.entity.ResultData;
 import com.springboot.entity.ReturnCode;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +16,21 @@ public class RestExceptionHandlerInterceptor {
      * 默认全局异常处理。
      * @param e the e
      * @return ResultData
-     * @RestControllerAdvice RestController的增强类，可用于实现全局异常处理器
-     * @ExceptionHandler 统一处理某一类异常，从而减少代码重复率和复杂度，比如要获取自定义异常可以@ExceptionHandler(BusinessException.class)
-     * @ResponseStatus 指定客户端收到的http状态码
+     * RestControllerAdvice RestController的增强类，可用于实现全局异常处理器
+     * ExceptionHandler 统一处理某一类异常，从而减少代码重复率和复杂度，比如要获取自定义异常可以@ExceptionHandler(BusinessException.class)
+     * ResponseStatus 指定客户端收到的http状态码
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultData<String> exception(Exception e) {
         log.error("全局异常信息 ex={}", e.getMessage(), e);
-        return ResultData.fail(ReturnCode.EMAIL_OR_PASSWORD_ERROR.getCode(), e.getMessage());
+        return ResultData.fail(ReturnCode.RC500.getCode(), ReturnCode.RC500.getMessage());
     }
 
+    @ExceptionHandler(MyException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResultData<String> myException(MyException e) {
+        log.error("自定义异常信息 ex={}", e.getMessage(), e);
+        return ResultData.fail(e.getCode(), e.getMessage());
+    }
 }

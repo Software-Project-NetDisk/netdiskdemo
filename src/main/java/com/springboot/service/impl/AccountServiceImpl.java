@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-
     @Autowired
     private UserInfoMapper userInfoMapper;
 
@@ -41,16 +40,5 @@ public class AccountServiceImpl implements AccountService {
         userInfo.setUser_name(user_name);
 
         return userInfoMapper.insert(userInfo);
-    }
-
-    public UserInfo getInfo(String token) {
-        TokenUtil tokenUtil = new TokenUtil();
-        HashMap<String, String> map = tokenUtil.parseToken(token);
-        Integer user_id = Integer.parseInt(map.get("user_id"));
-        UserInfo userInfo = userInfoMapper.selectById(user_id);
-
-        // 抹去密码信息
-        userInfo.setPassword(null);
-        return userInfo;
     }
 }
