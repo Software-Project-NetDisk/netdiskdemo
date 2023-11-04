@@ -6,6 +6,8 @@ import com.springboot.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -82,12 +84,16 @@ public class FileInfoController {
         Integer file_pid = (Integer) map.get("file_pid");
         String file_md5 = (String)map.get("file_md5");
         String file_name = (String)map.get("file_name");
+        Integer file_size = (Integer) map.get("file_size");
 
         FileInfo fileInfo = new FileInfo();
         fileInfo.setUser_id(user_id);
         fileInfo.setFile_pid(file_pid);
         fileInfo.setFile_md5(file_md5);
         fileInfo.setFile_name(file_name);
+        fileInfo.setFile_size(file_size);
+        fileInfo.setIs_folder(0);
+        fileInfo.setUpdate_time(new Timestamp(System.currentTimeMillis()));
 
         ResultData resultData = new ResultData<>();
         Integer code = fileService.mergeFile(fileInfo);

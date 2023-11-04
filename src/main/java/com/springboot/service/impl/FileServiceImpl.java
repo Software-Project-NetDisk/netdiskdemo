@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
@@ -40,6 +39,7 @@ public class FileServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> imple
         fileInfo.setUser_id(user_id);
         fileInfo.setFile_pid(file_pid);
         fileInfo.setIs_folder(1);
+        fileInfo.setFile_size(0);
 
         return fileInfoMapper.insert(fileInfo);
     }

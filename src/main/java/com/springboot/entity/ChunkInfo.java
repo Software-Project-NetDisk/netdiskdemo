@@ -34,6 +34,10 @@ public class ChunkInfo {
     private Integer totalSize;
     @TableField(value = "file_type")
     private String filetype;
+    @TableField(value = "user_id")
+    private Integer userId;
+    @TableField(value = "file_pid")
+    private Integer filePid;
 
     @TableField(exist = false)
     // 块内容
