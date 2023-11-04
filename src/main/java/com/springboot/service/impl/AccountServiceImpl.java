@@ -8,7 +8,7 @@ import com.springboot.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.sql.Timestamp;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -38,6 +38,7 @@ public class AccountServiceImpl implements AccountService {
         userInfo.setEmail(email);
         userInfo.setPassword(password);
         userInfo.setUser_name(user_name);
+        userInfo.setDeadline(new Timestamp(System.currentTimeMillis()));
 
         return userInfoMapper.insert(userInfo);
     }
