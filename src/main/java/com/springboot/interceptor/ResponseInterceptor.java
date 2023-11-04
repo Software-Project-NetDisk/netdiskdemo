@@ -39,10 +39,8 @@ public class ResponseInterceptor implements ResponseBodyAdvice<Object> {
             return body;
         }
         if (body instanceof String) {
-            System.out.println(JSON.toJSONString(ResultData.success(body)));
             return JSON.toJSONString(ResultData.success(body));
         }
         return ResultData.success(body);
-
     }
 }

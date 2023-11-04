@@ -1,6 +1,17 @@
+# 上传文件存储路径
+base:
+  file-path: D:\NetDiskTest
+
 server:
   port: 8080
 spring:
+  servlet:
+    multipart:
+      enabled: true #是否支持 multipart 上传文件
+      file-size-threshold: 0 #支持文件写入磁盘
+      max-request-size: -1  #最大支持请求大小
+      max-file-size: -1     #最大支持文件大小
+      resolve-lazily: false  #是否支持 multipart 上传文件时懒加载
   application:
     name: netdiskdemo
   datasource:

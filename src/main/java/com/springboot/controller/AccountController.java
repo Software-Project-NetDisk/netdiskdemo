@@ -2,12 +2,10 @@ package com.springboot.controller;
 
 import com.springboot.entity.MyException;
 import com.springboot.entity.ReturnCode;
-import com.springboot.entity.UserInfo;
 import com.springboot.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 

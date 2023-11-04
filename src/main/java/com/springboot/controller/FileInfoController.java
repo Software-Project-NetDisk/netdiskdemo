@@ -1,24 +1,24 @@
 package com.springboot.controller;
 
-
-import com.springboot.entity.FileInfo;
-import com.springboot.entity.MyException;
-import com.springboot.entity.ReturnCode;
-import com.springboot.mapper.FileInfoMapper;
+import com.springboot.entity.*;
+import com.springboot.service.ChunkInfoService;
 import com.springboot.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @CrossOrigin
 @RequestMapping("/file")
 public class FileInfoController {
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private ChunkInfoService chunkInfoService;
 
     @PostMapping("/fileList")
     public List<FileInfo> getFileList(@RequestBody Map<String,Object> map) throws MyException {
@@ -44,5 +44,63 @@ public class FileInfoController {
             String message = ReturnCode.FAILED_TO_CREATE_FOLDER.getMessage();
             throw new MyException(code, message);
         }
+    }
+    /**
+     * 校验文件
+     *
+     * @param chunk
+     * @return
+     */
+    @GetMapping("/uploadFile")
+    public ChunkResult checkChunk(ChunkInfo chunk) {
+        log.info("校验文件：{}", chunk);
+        return chunkInfoService.checkChunkState(chunk);
+    }
+
+    /**
+     * 文件块上传
+     *
+     * @param chunk
+     * @return
+     */
+    @PostMapping("/uploadFile")
+    public ResultData uploadChunk(ChunkInfo chunk) {
+        ResultData resultData = new ResultData<>();
+        Integer code = chunkInfoService.uploadFile(chunk);
+        if (code == ReturnCode.RC200.getCode()) {
+            resultData.setStatus(ReturnCode.RC200.getCode());
+            resultData.setMessage("上传成功");
+        } else {
+            resultData.setStatus(ReturnCode.UPLOAD_FAILED.getCode());
+            resultData.setMessage("上传失败");
+        }
+        return resultData;
+    }
+    @PostMapping("/mergeFile")
+    public ResultData mergeFile(@RequestBody Map<String,Object> map) {
+        Integer user_id = (Integer) map.get("user_id");
+        Integer file_pid = (Integer) map.get("file_pid");
+        String file_md5 = (String)map.get("file_md5");
+        String file_name = (String)map.get("file_name");
+
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setUser_id(user_id);
+        fileInfo.setFile_pid(file_pid);
+        fileInfo.setFile_md5(file_md5);
+        fileInfo.setFile_name(file_name);
+
+        ResultData resultData = new ResultData<>();
+        Integer code = fileService.mergeFile(fileInfo);
+        if (code == ReturnCode.RC200.getCode()) {
+            resultData.setStatus(ReturnCode.RC200.getCode());
+            resultData.setMessage("合并成功");
+        } else if (code == ReturnCode.FILE_EXIT.getCode()) {
+            resultData.setStatus(ReturnCode.RC200.getCode());
+            resultData.setMessage("文件已存在，无需合并");
+        } else {
+            resultData.setStatus(ReturnCode.MERGE_ERROR.getCode());
+            resultData.setMessage("合并失败");
+        }
+        return resultData;
     }
 }
