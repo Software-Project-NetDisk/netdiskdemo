@@ -17,6 +17,10 @@ public class ChunkResult implements Serializable {
      */
     private boolean skipUpload;
     /**
+     * 容量是否足够上传当前文件
+     */
+    private boolean overflow;
+    /**
      *已经上传的文件块编号，可以跳过，断点续传
      */
     private ArrayList<Integer> uploadedChunks;

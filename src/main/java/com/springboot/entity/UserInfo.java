@@ -1,12 +1,15 @@
 package com.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
@@ -22,4 +25,7 @@ public class UserInfo {
     private Integer space;
     private Integer is_VIP;
     private Timestamp deadline;
+    @TableField(exist = false)
+    // 块内容
+    private BigDecimal space_used;
 }

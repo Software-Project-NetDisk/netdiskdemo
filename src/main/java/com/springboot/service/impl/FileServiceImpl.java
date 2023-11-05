@@ -49,6 +49,7 @@ public class FileServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> imple
         String filename = fileInfo.getFile_name();
         String file = uploadFolder + File.separator + fileInfo.getFile_md5() + File.separator + filename;
         String folder = uploadFolder + File.separator + fileInfo.getFile_md5();
+
         Integer fileSuccess = FileInfoUtil.merge(file, folder, filename);
         fileInfo.setFile_path(folder);
         QueryWrapper<ChunkInfo> wrapper = new QueryWrapper<>();

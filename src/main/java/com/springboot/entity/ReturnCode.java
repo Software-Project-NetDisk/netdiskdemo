@@ -23,6 +23,7 @@ public enum ReturnCode {
     NEED_MERGE(301, "需要合并"),
     UPLOAD_FAILED(400, "上传文件失败"),
     MERGE_ERROR(401, "文件合并失败"),
+    OVERFLOW(402, "空间不足"),
     WRITE_ERROR(415, "写文件出错"),
     RC500(500,"系统异常，请稍后重试"),
 

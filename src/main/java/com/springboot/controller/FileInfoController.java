@@ -54,9 +54,16 @@ public class FileInfoController {
      * @return
      */
     @GetMapping("/uploadFile")
-    public ChunkResult checkChunk(ChunkInfo chunk) {
+    public ChunkResult checkChunk(ChunkInfo chunk) throws MyException {
         log.info("校验文件：{}", chunk);
-        return chunkInfoService.checkChunkState(chunk);
+        ChunkResult chunkResult = chunkInfoService.checkChunkState(chunk);
+        if (chunkResult.isOverflow()) {
+            int code = ReturnCode.OVERFLOW.getCode();
+            String message = ReturnCode.OVERFLOW.getMessage();
+            throw new MyException(code, message);
+        } else {
+            return chunkResult;
+        }
     }
 
     /**
@@ -101,6 +108,7 @@ public class FileInfoController {
             resultData.setStatus(ReturnCode.RC200.getCode());
             resultData.setMessage("合并成功");
         } else if (code == ReturnCode.FILE_EXIT.getCode()) {
+
             resultData.setStatus(ReturnCode.RC200.getCode());
             resultData.setMessage("文件已存在，无需合并");
         } else {

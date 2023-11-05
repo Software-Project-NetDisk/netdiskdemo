@@ -2,12 +2,10 @@ package com.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.springboot.entity.ChunkInfo;
-import com.springboot.entity.ChunkResult;
-import com.springboot.entity.FileInfo;
-import com.springboot.entity.ReturnCode;
+import com.springboot.entity.*;
 import com.springboot.mapper.ChunkInfoMapper;
 import com.springboot.mapper.FileInfoMapper;
+import com.springboot.mapper.UserInfoMapper;
 import com.springboot.service.ChunkInfoService;
 import com.springboot.utils.FileInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -33,6 +31,7 @@ public class ChunkInfoServiceImpl extends ServiceImpl<ChunkInfoMapper, ChunkInfo
     private ChunkInfoMapper chunkInfoMapper;
     @Autowired
     private FileInfoMapper fileInfoMapper;
+    @Autowired UserInfoMapper userInfoMapper;
 
     /**
      * 校验当前文件
@@ -45,14 +44,32 @@ public class ChunkInfoServiceImpl extends ServiceImpl<ChunkInfoMapper, ChunkInfo
         String file = uploadFolder + File.separator + chunkInfo.getIdentifier() + File.separator + chunkInfo.getFilename();
 
         QueryWrapper<FileInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("file_md5", chunkInfo.getIdentifier());
-        // 通过md5查询数据库中是否已经有该文件，有的话就跳过上传实现秒传
-        List<FileInfo> fileInfos = fileInfoMapper.selectList(wrapper);
-        if (fileInfos.size() > 0) {
+        // 判断容量是否足够上传
+        wrapper.eq("user_id", chunkInfo.getUserId());
+        wrapper.select("sum(file_size) as space_used");
+        BigDecimal space_used = (BigDecimal) fileInfoMapper.selectMaps(wrapper).get(0).get("space_used");
+        wrapper.clear();
+        long space =  userInfoMapper.selectById(chunkInfo.getUserId()).getSpace();
+        System.out.println("space_used: "+space_used);
+        System.out.println("space:" + space);
+        System.out.println("total: "+(chunkInfo.getTotalSize() + Integer.parseInt(space_used.toString())));
+        if (chunkInfo.getTotalSize() + Integer.parseInt(space_used.toString()) > space) {
+            chunkResult.setSkipUpload(true);
+            chunkResult.setLocation(file);
+            chunkResult.setMessage("容量不足，无法上传");
+            chunkResult.setOverflow(true);
+            return chunkResult;
+        }
+
+        wrapper.clear();
+        // 查询本地是否已经有该文件，有的话就跳过上传实现秒传
+
+        if (FileInfoUtil.fileExists(file)) {
             chunkResult.setSkipUpload(true);
             chunkResult.setLocation(file);
             chunkResult.setMessage("完整文件已存在，直接跳过上传，实现秒传");
             // 判断当前用户的当前目录下是否有该文件，没有则新插入一条记录
+            wrapper.eq("file_md5", chunkInfo.getIdentifier());
             wrapper.eq("user_id", chunkInfo.getUserId());
             wrapper.eq("file_pid", chunkInfo.getFilePid());
             FileInfo fileInfo1 = fileInfoMapper.selectOne(wrapper);
@@ -66,20 +83,12 @@ public class ChunkInfoServiceImpl extends ServiceImpl<ChunkInfoMapper, ChunkInfo
                 fileInfo.setUser_id(chunkInfo.getUserId());
                 fileInfo.setFile_pid(chunkInfo.getFilePid());
                 fileInfo.setRecycled(0);
-                fileInfo.setFile_path(fileInfos.get(0).getFile_path());
+                fileInfo.setFile_path(uploadFolder + File.separator + chunkInfo.getIdentifier());
                 fileInfo.setIs_folder(0);
                 fileInfoMapper.insert(fileInfo);
             }
             return chunkResult;
         }
-
-        if(FileInfoUtil.fileExists(file)) {
-            chunkResult.setSkipUpload(true);
-            chunkResult.setLocation(file);
-            chunkResult.setMessage("完整文件已存在，直接跳过上传，实现秒传");
-            return chunkResult;
-        }
-
 
         ArrayList<Integer> list = chunkInfoMapper.selectChunkNumbers(chunkInfo.getIdentifier(), chunkInfo.getFilename());
         if (list !=null && list.size() > 0) {
