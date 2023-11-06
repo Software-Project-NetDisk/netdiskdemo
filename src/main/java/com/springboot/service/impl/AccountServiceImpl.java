@@ -1,7 +1,9 @@
 package com.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.springboot.entity.RootInfo;
 import com.springboot.entity.UserInfo;
+import com.springboot.mapper.RootInfoMapper;
 import com.springboot.mapper.UserInfoMapper;
 import com.springboot.service.AccountService;
 import com.springboot.utils.TokenUtil;
@@ -16,6 +18,8 @@ public class AccountServiceImpl implements AccountService {
     private UserInfoMapper userInfoMapper;
 
     @Autowired
+    private RootInfoMapper rootInfoMapper;
+    @Autowired
     TokenUtil tokenUtil;
 
     public String login(String email, String password) {
@@ -28,6 +32,21 @@ public class AccountServiceImpl implements AccountService {
 
         if (userInfo != null) {
             token = tokenUtil.getToken(userInfo.getUser_id().toString(), userInfo.getEmail());
+        }
+
+        return token;
+    }
+
+    public String rootLogin(String email, String password) {
+        String token = null;
+
+        QueryWrapper<RootInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        wrapper.eq("password", password);
+        RootInfo rootInfo = rootInfoMapper.selectOne(wrapper);
+
+        if (rootInfo != null) {
+            token = tokenUtil.getToken(rootInfo.getUser_id().toString(), rootInfo.getEmail());
         }
 
         return token;

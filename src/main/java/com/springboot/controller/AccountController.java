@@ -17,18 +17,24 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping("/login")
-    public HashMap<String, String> login(@RequestBody Map<String,Object> map) throws MyException {
+    public HashMap<String, Object> login(@RequestBody Map<String,Object> map) throws MyException {
         String email = (String) map.get("email");
         String password = (String) map.get("password");
-
-        String token = accountService.login(email, password);
+        String token = accountService.rootLogin(email, password);
+        if (token != null) {
+            HashMap<String, Object> res = new HashMap<>();
+            res.put("token", token);
+            res.put("isRoot", true);
+            return res;
+        }
+        token = accountService.login(email, password);
         if (token == null) {
             int code = ReturnCode.EMAIL_OR_PASSWORD_ERROR.getCode();
             String message = ReturnCode.EMAIL_OR_PASSWORD_ERROR.getMessage();
             throw new MyException(code, message);
         }
 
-        HashMap<String, String> res = new HashMap<>();
+        HashMap<String, Object> res = new HashMap<>();
         res.put("token", token);
         return res;
     }

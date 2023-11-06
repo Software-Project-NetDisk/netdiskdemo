@@ -56,11 +56,9 @@ public class TokenHandlerInterceptor implements HandlerInterceptor {
 
         String user_id = map.get("userId");
         String userRole = map.get("userRole");
+//        System.out.println("userRole:"+userRole);
         long timeOfUse = System.currentTimeMillis() - Long.parseLong(map.get("timeStamp"));
-//        log.info("tokenTime"+map.get("timeStamp"));
-//        log.info("systemTime"+System.currentTimeMillis());
-//        log.info("timeOfUse"+Long.toString(timeOfUse));
-//        log.info("refreshTime"+Long.toString(refreshTime));
+
         //1.判断 token 是否过期
         if (timeOfUse < refreshTime) {
             log.info("token验证成功");
