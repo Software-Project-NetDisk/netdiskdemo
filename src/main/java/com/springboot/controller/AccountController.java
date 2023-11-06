@@ -48,4 +48,19 @@ public class AccountController {
             throw new MyException(code, message);
         }
     }
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestBody Map<String,Object> map) throws MyException{
+        Integer user_id = (Integer) map.get("user_id");
+        String password = (String) map.get("password");
+        String new_password = (String) map.get("new_password");
+        try {
+           int n = accountService.changePassword(user_id,password,new_password);
+           if (n==0) return "修改成功";
+           else return "原密码输入错误";
+        }catch(Exception e){
+            int code = ReturnCode.EMAIL_EXIST.getCode();
+            String message = ReturnCode.EMAIL_EXIST.getMessage();
+            throw new MyException(code, message);
+        }
+    }
 }

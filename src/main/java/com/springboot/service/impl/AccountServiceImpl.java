@@ -1,6 +1,7 @@
 package com.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.springboot.entity.FileInfo;
 import com.springboot.entity.UserInfo;
 import com.springboot.mapper.UserInfoMapper;
 import com.springboot.service.AccountService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -41,5 +43,19 @@ public class AccountServiceImpl implements AccountService {
         userInfo.setDeadline(new Timestamp(System.currentTimeMillis()));
 
         return userInfoMapper.insert(userInfo);
+    }
+    public int changePassword(Integer user_id,String password,String new_password){
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", user_id);
+        List<UserInfo> userInfos = userInfoMapper.selectList(wrapper);
+        String psw = userInfos.get(0).getPassword();
+        if(psw.equals(password)){
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUser_id(user_id);
+            userInfo.setPassword(new_password);
+            userInfoMapper.updateById(userInfo);
+            return 0;
+        }
+        return 1;
     }
 }
