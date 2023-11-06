@@ -117,4 +117,47 @@ public class FileInfoController {
         }
         return resultData;
     }
+    /*
+    文件彻底删除
+    */
+    @PostMapping("/deleteFile")
+    public int deleteFile (@RequestBody Map<String,Object> map) throws MyException {
+        List<Integer> file_id = (List<Integer>) map.get("file_id");
+        try{
+            int deletefile = fileService.deleteFile(file_id);
+            System.out.println("删除成功"+deletefile+"个文件");
+            return deletefile;
+        }catch (Exception e){
+            int code = ReturnCode.FAILED_TO_CREATE_FOLDER.getCode();
+            String message = ReturnCode.FAILED_TO_CREATE_FOLDER.getMessage();
+            throw new MyException(code, message);
+        }
+    }
+    /*
+    逻辑删除
+    */
+    @PostMapping("/recycleFile")
+    public int recycleFile (@RequestBody Map<String,Object> map) throws MyException{
+        Integer user_id = (Integer) map.get("user_id");
+        Integer file_pid = (Integer) map.get("file_pid");
+        List<Integer> file_id = (List<Integer>) map.get("file_id");
+        Integer recycled = (Integer) map.get("recycled");
+        try{
+            int fileInfos = fileService.recycleFile(user_id, file_pid,file_id,recycled);
+            System.out.println("回收成功"+fileInfos+"个文件");
+            return fileInfos;
+        }catch (Exception e){
+            int code = ReturnCode.FAILED_TO_CREATE_FOLDER.getCode();
+            String message = ReturnCode.FAILED_TO_CREATE_FOLDER.getMessage();
+            throw new MyException(code, message);
+        }
+    }
+    @PostMapping("/RecycleList")
+    public List<FileInfo> getRecycleList(@RequestBody Map<String,Object> map) throws MyException {
+        Integer user_id = (Integer) map.get("user_id");
+        Integer file_pid = (Integer) map.get("file_pid");
+        List<FileInfo> fileInfos = fileService.getRecycledInfo(user_id, file_pid);
+
+        return fileInfos;
+    }
 }
