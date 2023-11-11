@@ -1,6 +1,6 @@
 # 上传文件存储路径
 base:
-  file-path: D:\NetDiskTest
+  file-path: D:\java\apache-tomcat-9.0.82\apache-tomcat-9.0.82\webapps\demo
 
 server:
   port: 8080

@@ -7,6 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -160,4 +164,83 @@ public class FileInfoController {
 
         return fileInfos;
     }
+    @PostMapping("/DownLoad")
+//    public void downLoad(@RequestBody Map<String,Object> map) throws IOException {
+//        String file_name = (String) map.get("file_name");
+//        String file_path = (String) map.get("file_path");
+//        String destination = (String) map.get("destination");
+//        String fileOrigin = file_path+"/"+file_name;
+//        FileInputStream inputStream = new FileInputStream(fileOrigin);
+//        FileOutputStream outputStream = new FileOutputStream(destination);
+//        byte[] b = new byte[1024];
+//        int len;
+//        while((len=inputStream.read(b))!=-1){
+//            outputStream.write(b,0,len);
+//        }
+//
+//    }
+    public void downLoad(@RequestBody Map<String,Object> map,HttpServletResponse response) throws MyException, IOException {
+        String file_name = (String) map.get("file_name");
+        String file_path = (String) map.get("file_path");
+//        Integer VIP = (Integer) map.get("VIP");
+        byte[] name = file_name.getBytes(StandardCharsets.UTF_8);
+        String newFileName  = new String(name,"ISO-8859-1");
+        String fileOrigin = file_path+"/"+file_name;
+        FileInputStream inputStream = new FileInputStream(fileOrigin);
+        response.setHeader("Content-Disposition","attachment;filename="+newFileName);
+        BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+        byte[] b = new byte[1024];
+        int len;
+        while((len=inputStream.read(b))!=-1){
+            outputStream.write(b,0,len);
+        }
+//        if(VIP.equals(1)) {
+//            byte[] b = new byte[1024];
+//            int len;
+//            while((len=inputStream.read(b))!=-1){
+//                outputStream.write(b,0,len);
+//            }
+//        }else{
+//            byte[] b = new byte[1];
+//            int len;
+//            while((len=inputStream.read(b))!=-1){
+//                outputStream.write(b,0,len);
+//            }
+//        }
+        inputStream.close();
+        outputStream.close();
+    }
+//    public String downLoad(HttpServletRequest request,HttpServletResponse response) throws MyException, IOException {
+//        System.out.println("1");
+//        String file_name = request.getParameter("file_name");
+//        String file_path = request.getParameter("file_path");
+//        String VIP = request.getParameter("VIP");
+//        String velocity = "1";
+//        String fileOrigin = file_path+"/"+file_name;
+//        //文件名处理
+//        byte[] name = file_name.getBytes(StandardCharsets.UTF_8);
+//        String newFileName  = new String(name,"ISO-8859-1");
+//        FileInputStream inputStream = new FileInputStream(fileOrigin);
+//        response.setHeader("Content-Disposition","attachment;filename="+newFileName);
+//        BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+//        if(VIP.equals(velocity)) {
+//            byte[] b = new byte[1024];
+//            int len;
+//            while((len=inputStream.read(b))!=-1){
+//                outputStream.write(b,0,len);
+//            }
+//        }else{
+//            byte[] b = new byte[1];
+//            int len;
+//            while((len=inputStream.read(b))!=-1){
+//                outputStream.write(b,0,len);
+//            }
+//
+//        }
+//
+//        inputStream.close();
+//        outputStream.close();
+//        String a="1";
+//        return a;
+//    }
 }

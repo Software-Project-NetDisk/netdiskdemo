@@ -34,6 +34,7 @@ public class FileServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> imple
         QueryWrapper<FileInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", user_id);
         wrapper.eq("file_pid", file_pid);
+        wrapper.eq("recycled",0);
         List<FileInfo> fileInfo = fileInfoMapper.selectList(wrapper);
         return fileInfo;
     }
